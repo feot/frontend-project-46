@@ -1,6 +1,7 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
+  "type": "module",
   "description": "Compares two configuration files and shows a difference.",
   "main": "index.js",
   "scripts": {
@@ -18,5 +19,10 @@
   "bugs": {
     "url": "https://github.com/feot/frontend-project-46/issues"
   },
-  "homepage": "https://github.com/feot/frontend-project-46#readme"
+  "homepage": "https://github.com/feot/frontend-project-46#readme",
+  "devDependencies": {
+    "eslint": "^8.29.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  }
 }
