@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Compares two configuration files and shows a difference.",
+  "bin": {
+    "gendiff": "bin/gendiff.js"
+  },
   "main": "index.js",
   "scripts": {
     "test": "npx jest"
@@ -24,5 +27,8 @@
     "eslint": "^8.29.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0"
+  },
+  "dependencies": {
+    "commander": "^9.4.1"
   }
 }
