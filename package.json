@@ -6,7 +6,7 @@
   "bin": {
     "gendiff": "bin/gendiff.js"
   },
-  "main": "index.js",
+  "main": "./",
   "scripts": {
     "test": "npx jest"
   },
@@ -29,6 +29,7 @@
     "eslint-plugin-import": "^2.26.0"
   },
   "dependencies": {
-    "commander": "^9.4.1"
+    "commander": "^9.4.1",
+    "lodash": "^4.17.21"
   }
 }
