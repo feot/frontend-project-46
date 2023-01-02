@@ -1,0 +1,29 @@
+name: linter-and-tests
+on: push
+jobs:
+  linter-and-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: 'npm'
+
+      - name: install
+        run: make install
+
+      - name: run lint
+        run: make lint
+
+      - name: run tests
+        run: make test
+
+      - name: check code coverage
+        uses: paambaati/codeclimate-action@v3.2.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CLIMATE_ID }}
+        with:
+          coverageCommand: make test-coverage
+          debug: true
