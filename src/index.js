@@ -1,14 +1,14 @@
 import { existsSync, readFileSync } from 'fs';
-import { resolve as pathResolve } from 'path';
+import { resolve as pathResolve, extname } from 'path';
 import _ from 'lodash';
 
 const getDataParse = (filepath) => {
   const workingDir = process.cwd();
   const absFilepath = (existsSync(filepath)) ? filepath : pathResolve(workingDir, filepath);
-  const fileExtension = filepath.split('.').at(-1);
+  const fileExtension = extname(filepath);
 
   switch (fileExtension) {
-    case 'json':
+    case '.json':
       return JSON.parse(readFileSync(absFilepath), 'utf8');
     default:
       throw new Error(`Wrong file extension: ${fileExtension}`);
