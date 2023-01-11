@@ -9,4 +9,4 @@
 Compares two configuration files and shows a difference.
 
 ### Demonstration:
-[![asciicast](https://asciinema.org/a/549340.svg)](https://asciinema.org/a/549340)
+[![asciicast](https://asciinema.org/a/551084.svg)](https://asciinema.org/a/551084)
