@@ -15,7 +15,7 @@ program
   .action(async (filepath1, filepath2) => {
     const { format } = program.opts();
     const diff = await genDiff(filepath1, filepath2, format);
-    console.log('DIFFFFF\n', diff);
+    console.log(diff);
   });
 
 program.parse();
