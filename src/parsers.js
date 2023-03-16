@@ -12,6 +12,8 @@ export default (filepath) => {
       return JSON.parse(readFileSync(absFilepath), 'utf8');
     case '.yaml':
       return yaml.load(readFileSync(absFilepath), 'utf8');
+    case '.yml':
+      return yaml.load(readFileSync(absFilepath), 'utf8');
     default:
       throw new Error(`Wrong file extension: ${fileExtension}`);
   }
