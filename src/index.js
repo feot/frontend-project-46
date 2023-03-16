@@ -5,13 +5,6 @@ import formatterRouter from './formatters/formatterRouter.js';
 const genDiff = (filepath1, filepath2, format) => {
   const dataParse1 = parsers(filepath1);
   const dataParse2 = parsers(filepath2);
-  console.log({
-    filepath1,
-    filepath2,
-    format,
-    dataParse1,
-    dataParse2,
-  });
 
   const iter = (data1, data2) => {
     const keys = _.union(Object.keys(data1), Object.keys(data2)).sort();
