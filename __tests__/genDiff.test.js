@@ -2,35 +2,33 @@ import { test, expect } from '@jest/globals';
 import genDiff from '../src/index.js';
 import { resultPlain, resultStylish } from '../__fixtures__/test_results.js';
 
-test('json', async () => {
+test('json', () => {
   const file1Path = '__fixtures__/file1.json';
   const file2Path = '__fixtures__/file2.json';
-  const receivedResult = await genDiff(file1Path, file2Path);
+  const receivedResult = genDiff(file1Path, file2Path);
 
   expect(receivedResult).toEqual(resultStylish);
 });
 
-test('yaml', async () => {
+test('yaml', () => {
   const file1Path = '__fixtures__/file1.yml';
   const file2Path = '__fixtures__/file2.yml';
-  const receivedResult = await genDiff(file1Path, file2Path);
+  const receivedResult = genDiff(file1Path, file2Path);
 
   expect(receivedResult).toEqual(resultStylish);
 });
 
-test('plain style', async () => {
+test('plain style', () => {
   const file1Path = '__fixtures__/file1.yml';
   const file2Path = '__fixtures__/file2.yml';
-  const receivedResult = await genDiff(file1Path, file2Path, 'plain');
+  const receivedResult = genDiff(file1Path, file2Path, 'plain');
 
   expect(receivedResult).toEqual(resultPlain);
 });
 
-test('unsupported file extension', async () => {
+test('unsupported file extension', () => {
   const file1Path = '__fixtures__/file1.pdf';
   const file2Path = '__fixtures__/file2.pdf';
 
-  await expect(genDiff(file1Path, file2Path))
-    .rejects
-    .toThrow();
+  expect(() => genDiff(file1Path, file2Path)).toThrow(Error);
 });

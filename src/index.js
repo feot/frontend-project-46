@@ -2,7 +2,7 @@ import _ from 'lodash';
 import parsers from './parsers.js';
 import formatterRouter from './formatters/formatterRouter.js';
 
-const genDiff = async (filepath1, filepath2, format = 'stylish') => {
+const genDiff = (filepath1, filepath2, format) => {
   const dataParse1 = parsers(filepath1);
   const dataParse2 = parsers(filepath2);
   console.log({
@@ -62,7 +62,7 @@ const genDiff = async (filepath1, filepath2, format = 'stylish') => {
     state: 'stayed',
     children: iter(dataParse1, dataParse2),
   };
-  const { default: formatter } = await formatterRouter(format);
+  const formatter = formatterRouter(format);
 
   return formatter(differenceTree);
 };
