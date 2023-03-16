@@ -6,6 +6,7 @@ export default (filepath) => {
   const workingDir = process.cwd();
   const absFilepath = (existsSync(filepath)) ? filepath : pathResolve(workingDir, filepath);
   const fileExtension = extname(filepath);
+  console.log('fileExtension', fileExtension);
 
   switch (fileExtension) {
     case '.json':

@@ -3,6 +3,11 @@ import parsers from './parsers.js';
 import formatterRouter from './formatters/formatterRouter.js';
 
 const genDiff = async (filepath1, filepath2, format = 'stylish') => {
+  console.log({
+    filepath1,
+    filepath2,
+    format,
+  });
   const dataParse1 = parsers(filepath1);
   const dataParse2 = parsers(filepath2);
 
