@@ -12,9 +12,9 @@ program
   .argument('<filepath2>')
   .option('-V, --version', 'output the version number')
   .option('-f, --format <type>', 'output format')
-  .action(async (filepath1, filepath2) => {
+  .action((filepath1, filepath2) => {
     const { format } = program.opts();
-    const diff = await genDiff(filepath1, filepath2, format);
+    const diff = genDiff(filepath1, filepath2, format);
     console.log(diff);
   });
 
