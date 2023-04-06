@@ -7,9 +7,10 @@ const genDiff = (filepath1, filepath2, format) => {
   const dataParse2 = parser(filepath2);
 
   const iter = (data1, data2) => {
-    const keys = _.union(Object.keys(data1), Object.keys(data2)).sort();
+    const uniqueKeys = _.union(Object.keys(data1), Object.keys(data2));
+    const uniqueKeysSorted = _.sortBy(uniqueKeys, (key) => key);
 
-    return keys
+    return uniqueKeysSorted
       .map((key) => {
         const file1Value = data1[key];
         const file2Value = data2[key];
