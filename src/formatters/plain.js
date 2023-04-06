@@ -7,17 +7,22 @@ const valueFormatter = (value) => {
   return value;
 };
 
-const differenceStringify = (differenceObj) => Object.entries(differenceObj)
-  .map(([key, value]) => {
-    const state = (value.state === 'added' && Object.hasOwn(value, 'oldValue')) ? 'updated' : value.state;
+const differenceStringify = (difference) => difference
+  .map((differenceItem) => {
+    const {
+      key,
+      state,
+      oldValue,
+      value,
+    } = differenceItem;
     const diffBoilerplate = `Property '${key}' was ${state}`;
     const diffTail = (() => {
       switch (state) {
         case 'added':
-          return ` with value: ${valueFormatter(value.value)}`;
+          return ` with value: ${valueFormatter(value)}`;
 
         case 'updated':
-          return `. From ${valueFormatter(value.oldValue)} to ${valueFormatter(value.value)}`;
+          return `. From ${valueFormatter(oldValue)} to ${valueFormatter(value)}`;
 
         default:
           return '';
@@ -28,46 +33,52 @@ const differenceStringify = (differenceObj) => Object.entries(differenceObj)
   })
   .join('\n');
 
-const plain = (differenceTree) => {
-  const res = {};
+const mergeDifferenceTree = (differenceTree) => differenceTree
+  .map((item) => {
+    const itemWithSameKey = differenceTree
+      .find((itemB) => (itemB.key === item.key) && itemB.value !== item.value);
 
-  const iter = (data, keyPath) => {
-    if (!data?.children?.length && !_.isObject(data.value)) {
-      return data.value;
+    if (itemWithSameKey && item?.state === 'removed') {
+      return {
+        ...item,
+        toDelete: true,
+      };
+    }
+    if (itemWithSameKey) {
+      return {
+        ...item,
+        state: 'updated',
+        oldValue: itemWithSameKey.value,
+      };
+    }
+    return { ...item };
+  })
+  .filter((item) => !item.toDelete);
+
+const plain = (differenceTree) => {
+  const iter = (item, keyPath) => {
+    const newKeyPath = (keyPath) ? `${keyPath}.${item.key}` : item.key;
+    const value = (_.isObject(item.value)) ? '[complex value]' : item.value;
+
+    if (!item.children) {
+      return [{
+        state: item?.state,
+        key: newKeyPath,
+        value,
+      }];
     }
 
-    const children = (() => {
-      if (data?.children?.length) {
-        return data.children;
-      }
-      return Object.entries(data.value).map(([key, value]) => ({ key, value }));
-    })();
+    const newChildren = item.children
+      .map((child) => iter(child, newKeyPath))
+      .flat();
 
-    children.forEach((item) => {
-      const newKeyPath = (keyPath) ? `${keyPath}.${item.key}` : item.key;
-      const itemState = item.state;
-      const value = (_.isObject(iter(item, newKeyPath))) ? '[complex value]' : iter(item, newKeyPath);
-
-      if (itemState && itemState !== 'stayed') {
-        if (Object.hasOwn(res, newKeyPath)) {
-          res[newKeyPath] = {
-            oldValue: res[newKeyPath].value,
-            value,
-            state: itemState,
-          };
-        } else {
-          res[newKeyPath] = {
-            value,
-            state: itemState,
-          };
-        }
-      }
-    });
-
-    return res;
+    return newChildren;
   };
 
-  return differenceStringify(iter(differenceTree, ''));
+  const differenceTreeFlatted = iter(differenceTree, '')
+    .filter((item) => item.state && item.state !== 'stayed');
+  const differenceTreeMerged = mergeDifferenceTree(differenceTreeFlatted);
+  return differenceStringify(differenceTreeMerged);
 };
 
 export default plain;
