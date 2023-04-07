@@ -1,29 +1,20 @@
-import { test, expect } from '@jest/globals';
+import { describe, test, expect } from '@jest/globals';
 import genDiff from '../src/index.js';
-import { resultPlain, resultStylish } from '../__fixtures__/test_results.js';
+import { resultPlain, resultStylish, resultJSON } from '../__fixtures__/test_results.js';
 
-test('json', () => {
-  const file1Path = '__fixtures__/file1.json';
-  const file2Path = '__fixtures__/file2.json';
-  const receivedResult = genDiff(file1Path, file2Path);
+const cases = [
+  ['__fixtures__/file1.json', '__fixtures__/file2.json', resultStylish, 'stylish'],
+  ['__fixtures__/file1.yaml', '__fixtures__/file2.yml', resultStylish, 'stylish'],
+  ['__fixtures__/file1.json', '__fixtures__/file2.json', resultPlain, 'plain'],
+  ['__fixtures__/file1.yaml', '__fixtures__/file2.yml', resultPlain, 'plain'],
+  ['__fixtures__/file1.json', '__fixtures__/file2.json', resultJSON, 'json'],
+  ['__fixtures__/file1.yaml', '__fixtures__/file2.yml', resultJSON, 'json'],
+];
 
-  expect(receivedResult).toEqual(resultStylish);
-});
-
-test('yaml', () => {
-  const file1Path = '__fixtures__/file1.yml';
-  const file2Path = '__fixtures__/file2.yml';
-  const receivedResult = genDiff(file1Path, file2Path);
-
-  expect(receivedResult).toEqual(resultStylish);
-});
-
-test('plain style', () => {
-  const file1Path = '__fixtures__/file1.yml';
-  const file2Path = '__fixtures__/file2.yml';
-  const receivedResult = genDiff(file1Path, file2Path, 'plain');
-
-  expect(receivedResult).toEqual(resultPlain);
+describe('output formats', () => {
+  test.each(cases)('difference %s and %s', (a, b, result, format = 'stylish') => {
+    expect(genDiff(a, b, format)).toEqual(result);
+  });
 });
 
 test('unsupported file extension', () => {
