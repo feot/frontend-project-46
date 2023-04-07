@@ -10,3 +10,13 @@ Compares two configuration files and shows a difference.
 
 ### Demonstration:
 [![asciicast](https://asciinema.org/a/567827.svg)](https://asciinema.org/a/567827)
+
+# Requirements:
+node version: ^v16.20.0
+make version: ^4.2.1
+
+# Setup:
+1. Clone this repo
+2. ```make install```
+3. ```npm link```
+4. ```gendiff -h```
