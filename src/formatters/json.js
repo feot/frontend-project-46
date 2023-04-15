@@ -1,3 +1,1 @@
-const formatter = (differenceTree) => JSON.stringify(differenceTree);
-
-export default formatter;
+export default (differenceTree) => JSON.stringify(differenceTree);

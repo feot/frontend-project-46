@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const formatter = (differenceTree) => {
+export default (differenceTree) => {
   const spacesCount = 4;
 
   const iter = (currentValue, depth) => {
@@ -42,5 +42,3 @@ const formatter = (differenceTree) => {
 
   return iter(differenceTree, 1);
 };
-
-export default formatter;

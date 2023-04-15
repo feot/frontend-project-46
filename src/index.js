@@ -1,74 +1,28 @@
-import _ from 'lodash';
+import { existsSync, readFileSync } from 'fs';
+import { resolve as pathResolve, extname } from 'path';
 import parser from './parsers.js';
-import formatterRouter from './formatters/formatterRouter.js';
+import formatter from './formatters/index.js';
+import genDiffTree from './genDiffTree.js';
 
-const genDiff = (filepath1, filepath2, format) => {
-  const dataParse1 = parser(filepath1);
-  const dataParse2 = parser(filepath2);
+const getData = (filepath) => {
+  const workingDir = process.cwd();
+  const absFilepath = (existsSync(filepath)) ? filepath : pathResolve(workingDir, filepath);
 
-  const iter = (data1, data2) => {
-    const uniqueKeys = _.union(Object.keys(data1), Object.keys(data2));
-    const uniqueKeysSorted = _.sortBy(uniqueKeys, (key) => key);
+  if (!existsSync(absFilepath)) {
+    throw new Error(`No such file, open '${absFilepath}'`);
+  }
 
-    return uniqueKeysSorted
-      .map((key) => {
-        const file1Value = data1[key];
-        const file2Value = data2[key];
-        const isFile1KeyExist = !(file1Value === undefined);
-        const isFile2KeyExist = !(file2Value === undefined);
+  const fileExtension = extname(filepath);
 
-        if (_.isObject(file1Value) && _.isObject(file2Value)) {
-          return [{
-            key,
-            value: null,
-            state: 'stayed',
-            children: iter(file1Value, file2Value),
-          }];
-        }
-
-        if (isFile1KeyExist && isFile2KeyExist && file1Value !== file2Value) {
-          return [
-            {
-              key,
-              value: file1Value,
-              state: 'removed',
-              children: null,
-            },
-            {
-              key,
-              value: file2Value,
-              state: 'added',
-              children: null,
-            },
-          ];
-        }
-
-        const state = (() => {
-          if (isFile1KeyExist) {
-            return (file1Value === file2Value) ? 'stayed' : 'removed';
-          }
-          return (file1Value === file2Value) ? 'stayed' : 'added';
-        })();
-
-        return [{
-          key,
-          value: (isFile1KeyExist) ? file1Value : file2Value,
-          state,
-          children: null,
-        }];
-      })
-      .flat();
-  };
-
-  const differenceTree = {
-    key: null,
-    value: null,
-    state: 'stayed',
-    children: iter(dataParse1, dataParse2),
-  };
-  const formatter = formatterRouter(format);
-
-  return formatter(differenceTree);
+  return parser(readFileSync(absFilepath), fileExtension);
 };
 
-export default genDiff;
+const getFormattedDiff = (filepath1, filepath2, format = 'stylish') => {
+  const data1 = getData(filepath1);
+  const data2 = getData(filepath2);
+  const diffTree = genDiffTree(data1, data2);
+
+  return formatter(diffTree, format);
+};
+
+export default getFormattedDiff;
