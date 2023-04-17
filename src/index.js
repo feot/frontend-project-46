@@ -13,8 +13,9 @@ const getData = (filepath) => {
   }
 
   const fileExtension = extname(filepath);
+  const fileType = fileExtension.substring(1, fileExtension.length);
 
-  return parser(readFileSync(absFilepath), fileExtension);
+  return parser(readFileSync(absFilepath), fileType);
 };
 
 const getFormattedDiff = (filepath1, filepath2, format = 'stylish') => {

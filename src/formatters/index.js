@@ -14,6 +14,6 @@ export default (diffTree, format) => {
       return json(diffTree);
 
     default:
-      throw new Error(`Wrong file extension: ${format}`);
+      throw new Error(`Wrong format: ${format}`);
   }
 };
