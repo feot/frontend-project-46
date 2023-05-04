@@ -1,39 +1,49 @@
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { readFileSync } from 'fs';
 import { describe, test, expect } from '@jest/globals';
 import genDiff from '../src/index.js';
-import { resultPlain, resultStylish, resultJSON } from '../__fixtures__/test_results.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const getFixturePath = (filename) => join(__dirname, '..', '__fixtures__', filename);
+const readFile = (filename) => readFileSync(getFixturePath(filename), 'utf-8');
 
 const cases = [
-  ['__fixtures__/file1.json', '__fixtures__/file2.json', resultStylish, 'stylish'],
-  ['__fixtures__/file1.yaml', '__fixtures__/file2.yml', resultStylish, 'stylish'],
-  ['__fixtures__/file1.json', '__fixtures__/file2.json', resultPlain, 'plain'],
-  ['__fixtures__/file1.yaml', '__fixtures__/file2.yml', resultPlain, 'plain'],
-  ['__fixtures__/file1.json', '__fixtures__/file2.json', resultJSON, 'json'],
-  ['__fixtures__/file1.yaml', '__fixtures__/file2.yml', resultJSON, 'json'],
+  ['file1.json', 'file2.json', 'resultStylish'],
+  ['file1.yaml', 'file2.yml', 'resultStylish', 'stylish'],
+  ['file1.json', 'file2.json', 'resultPlain', 'plain'],
+  ['file1.yaml', 'file2.yml', 'resultPlain', 'plain'],
+  ['file1.json', 'file2.json', 'resultJSON.json', 'json'],
+  ['file1.yaml', 'file2.yml', 'resultJSON.json', 'json'],
 ];
 
 describe('output formats', () => {
-  test.each(cases)('difference %s and %s', (a, b, result, format = 'stylish') => {
-    expect(genDiff(a, b, format)).toEqual(result);
+  test.each(cases)('difference %s and %s', (filenameA, filenameB, resultName, format = 'stylish') => {
+    const filepathA = getFixturePath(filenameA);
+    const filepathB = getFixturePath(filenameB);
+
+    expect(genDiff(filepathA, filepathB, format)).toEqual(readFile(resultName));
   });
 });
 
 test('unsupported file extension', () => {
-  const file1Path = '__fixtures__/file1.txt';
-  const file2Path = '__fixtures__/file2.txt';
+  const filepathA = getFixturePath('file1.txt');
+  const filepathB = getFixturePath('file2.txt');
 
-  expect(() => genDiff(file1Path, file2Path)).toThrow(Error);
+  expect(() => genDiff(filepathA, filepathB)).toThrow(Error);
 });
 
 test('non-existing file', () => {
-  const file1Path = '__fixtures__/file1.pdf';
-  const file2Path = '__fixtures__/file2.pdf';
+  const filepathA = getFixturePath('file1.pdf');
+  const filepathB = getFixturePath('file2.pdf');
 
-  expect(() => genDiff(file1Path, file2Path)).toThrow(Error);
+  expect(() => genDiff(filepathA, filepathB)).toThrow(Error);
 });
 
 test('unsupported format', () => {
-  const file1Path = '__fixtures__/file1.json';
-  const file2Path = '__fixtures__/file2.json';
+  const filepathA = getFixturePath('file1.json');
+  const filepathB = getFixturePath('file2.json');
 
-  expect(() => genDiff(file1Path, file2Path, 'cool')).toThrow(Error);
+  expect(() => genDiff(filepathA, filepathB, 'cool')).toThrow(Error);
 });
