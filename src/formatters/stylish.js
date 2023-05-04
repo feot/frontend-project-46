@@ -20,8 +20,9 @@ export default (differenceTree) => {
     const lines = children
       .map((item) => {
         const stateSymbol = (() => {
-          switch (item.state) {
+          switch (item.type) {
             case 'removed':
+            case 'changed':
               return '-';
             case 'added':
               return '+';

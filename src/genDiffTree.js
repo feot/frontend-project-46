@@ -16,7 +16,7 @@ const genDiffTree = (data1, data2) => {
           return [{
             key,
             value: null,
-            state: 'stayed',
+            type: 'nested',
             children: iter(fileAValue, fileBValue),
           }];
         }
@@ -26,29 +26,29 @@ const genDiffTree = (data1, data2) => {
             {
               key,
               value: fileAValue,
-              state: 'removed',
+              type: 'changed',
               children: null,
             },
             {
               key,
               value: fileBValue,
-              state: 'added',
+              type: 'added',
               children: null,
             },
           ];
         }
 
-        const state = (() => {
+        const type = (() => {
           if (isFileAKeyExist) {
-            return (fileAValue === fileBValue) ? 'stayed' : 'removed';
+            return (fileAValue === fileBValue) ? 'unchanged' : 'removed';
           }
-          return (fileAValue === fileBValue) ? 'stayed' : 'added';
+          return (fileAValue === fileBValue) ? 'unchanged' : 'added';
         })();
 
         return [{
           key,
           value: (isFileAKeyExist) ? fileAValue : fileBValue,
-          state,
+          type,
           children: null,
         }];
       })
@@ -58,7 +58,7 @@ const genDiffTree = (data1, data2) => {
   return {
     key: null,
     value: null,
-    state: 'stayed',
+    type: 'nested',
     children: iter(data1, data2),
   };
 };

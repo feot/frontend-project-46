@@ -11,22 +11,20 @@ const differenceStringify = (difference) => difference
   .map((differenceItem) => {
     const {
       key,
-      state,
+      type,
       oldValue,
       value,
     } = differenceItem;
+    const state = (type === 'added' && oldValue !== undefined) ? 'updated' : type;
     const diffBoilerplate = `Property '${key}' was ${state}`;
     const diffTail = (() => {
-      switch (state) {
-        case 'added':
-          return ` with value: ${valueFormatter(value)}`;
-
-        case 'updated':
+      if (type === 'added') {
+        if (oldValue !== undefined) {
           return `. From ${valueFormatter(oldValue)} to ${valueFormatter(value)}`;
-
-        default:
-          return '';
+        }
+        return ` with value: ${valueFormatter(value)}`;
       }
+      return '';
     })();
 
     return `${diffBoilerplate}${diffTail}`;
@@ -38,22 +36,15 @@ const mergeDifferenceTree = (differenceTree) => differenceTree
     const itemWithSameKey = differenceTree
       .find((itemB) => (itemB.key === item.key) && itemB.value !== item.value);
 
-    if (itemWithSameKey && item?.state === 'removed') {
-      return {
-        ...item,
-        toDelete: true,
-      };
-    }
     if (itemWithSameKey) {
       return {
         ...item,
-        state: 'updated',
         oldValue: itemWithSameKey.value,
       };
     }
     return { ...item };
   })
-  .filter((item) => !item.toDelete);
+  .filter((item) => item?.type !== 'changed');
 
 const plain = (differenceTree) => {
   const iter = (item, keyPath) => {
@@ -62,7 +53,7 @@ const plain = (differenceTree) => {
 
     if (!item.children) {
       return [{
-        state: item?.state,
+        type: item?.type,
         key: newKeyPath,
         value,
       }];
@@ -76,7 +67,7 @@ const plain = (differenceTree) => {
   };
 
   const differenceTreeFlatted = iter(differenceTree, '')
-    .filter((item) => item.state && item.state !== 'stayed');
+    .filter((item) => item.type && item.type !== 'unchanged');
   const differenceTreeMerged = mergeDifferenceTree(differenceTreeFlatted);
   return differenceStringify(differenceTreeMerged);
 };
