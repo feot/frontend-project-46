@@ -3,10 +3,10 @@ import yaml from 'js-yaml';
 export default (data, type) => {
   switch (type) {
     case 'json':
-      return JSON.parse(data, 'utf8');
+      return JSON.parse(data);
     case 'yaml':
     case 'yml':
-      return yaml.load(data, 'utf8');
+      return yaml.load(data);
     default:
       throw new Error(`Wrong type: ${type}`);
   }
