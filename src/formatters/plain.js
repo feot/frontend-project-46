@@ -59,7 +59,6 @@ const plain = (differenceTree) => {
     .map((item) => iter(item, ''))
     .flat()
     .filter((item) => !(item?.type === 'unchanged'));
-  console.log(JSON.stringify(differenceTreeFlatted, null, 2));
   return differenceStringify(differenceTreeFlatted);
 };
 
