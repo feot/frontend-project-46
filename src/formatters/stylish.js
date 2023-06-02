@@ -1,37 +1,44 @@
 import _ from 'lodash';
 
-export default (differenceTree) => {
-  const spacesCount = 4;
+const getCurrentIndent = (depth, indentSize = 4) => ' '.repeat(indentSize * depth - 2);
+const getbracketIndent = (depth, indentSize = 4) => ' '.repeat(indentSize * depth - indentSize);
 
-  const iter = (currentValue, depth) => {
-    if (!currentValue?.children?.length && !_.isObject(currentValue.value)) {
-      return String(currentValue.value);
+const stringify = (value, depth = 1) => {
+  const iter = (currentValue, currentDepth) => {
+    if (!_.isObject(currentValue)) {
+      return String(currentValue);
     }
 
-    const indentSize = depth * spacesCount;
-    const currentIndent = ' '.repeat(indentSize - 2);
-    const bracketIndent = ' '.repeat(indentSize - spacesCount);
-    const children = (() => {
-      if (currentValue?.children?.length) {
-        return currentValue.children;
-      }
-      return Object.entries(currentValue.value).map(([key, value]) => ({ key, value }));
-    })();
-    const lines = children
-      .map((item) => {
-        const stateSymbol = (() => {
-          switch (item.type) {
-            case 'removed':
-            case 'changed':
-              return '-';
-            case 'added':
-              return '+';
-            default:
-              return ' ';
-          }
-        })();
+    const currentIndent = getCurrentIndent(currentDepth);
+    const bracketIndent = getbracketIndent(currentDepth);
+    const lines = Object.entries(currentValue)
+      .map(([key, keyValue]) => `${currentIndent}  ${key}: ${iter(keyValue, currentDepth + 1)}`);
 
-        return `${currentIndent}${stateSymbol} ${item.key}: ${iter(item, depth + 1)}`;
+    return ['{', ...lines, `${bracketIndent}}`].join('\n');
+  };
+
+  return iter(value, depth);
+};
+
+export default (differenceTree) => {
+  const iter = (currentValue, depth = 1) => {
+    const currentIndent = getCurrentIndent(depth);
+    const bracketIndent = getbracketIndent(depth);
+    const lines = currentValue
+      .flatMap((item) => {
+        switch (item.type) {
+          case 'nested':
+            return `${currentIndent}  ${item.key}: ${iter(item.children, depth + 1)}`;
+          case 'removed':
+            return `${currentIndent}- ${item.key}: ${stringify(item.value, depth + 1)}`;
+          case 'added':
+            return `${currentIndent}+ ${item.key}: ${stringify(item.value, depth + 1)}`;
+          case 'changed':
+            return [`${currentIndent}- ${item.key}: ${stringify(item.oldValue, depth + 1)}`,
+              `${currentIndent}+ ${item.key}: ${stringify(item.value, depth + 1)}`];
+          default:
+            return `${currentIndent}  ${item.key}: ${stringify(item.value, depth + 1)}`;
+        }
       });
 
     return [
@@ -41,5 +48,5 @@ export default (differenceTree) => {
     ].join('\n');
   };
 
-  return iter(differenceTree, 1);
+  return iter(differenceTree);
 };

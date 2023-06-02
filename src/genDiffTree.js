@@ -1,66 +1,58 @@
 import _ from 'lodash';
 
 const genDiffTree = (data1, data2) => {
-  const iter = (dataA, dataB) => {
-    const uniqueKeys = _.union(Object.keys(dataA), Object.keys(dataB));
-    const uniqueKeysSorted = _.sortBy(uniqueKeys, (key) => key);
+  const uniqueKeys = _.union(Object.keys(data1), Object.keys(data2));
+  const uniqueKeysSorted = _.sortBy(uniqueKeys, (key) => key);
 
-    return uniqueKeysSorted
-      .map((key) => {
-        const fileAValue = dataA[key];
-        const fileBValue = dataB[key];
-        const isFileAKeyExist = !(fileAValue === undefined);
-        const isFileBKeyExist = !(fileBValue === undefined);
+  return uniqueKeysSorted
+    .map((key) => {
+      const file1Value = data1[key];
+      const file2Value = data2[key];
 
-        if (_.isObject(fileAValue) && _.isObject(fileBValue)) {
-          return [{
-            key,
-            value: null,
-            type: 'nested',
-            children: iter(fileAValue, fileBValue),
-          }];
-        }
-
-        if (isFileAKeyExist && isFileBKeyExist && fileAValue !== fileBValue) {
-          return [
-            {
-              key,
-              value: fileAValue,
-              type: 'changed',
-              children: null,
-            },
-            {
-              key,
-              value: fileBValue,
-              type: 'added',
-              children: null,
-            },
-          ];
-        }
-
-        const type = (() => {
-          if (isFileAKeyExist) {
-            return (fileAValue === fileBValue) ? 'unchanged' : 'removed';
-          }
-          return (fileAValue === fileBValue) ? 'unchanged' : 'added';
-        })();
-
-        return [{
+      if (!Object.hasOwn(data1, key)) {
+        return {
           key,
-          value: (isFileAKeyExist) ? fileAValue : fileBValue,
-          type,
+          value: file2Value,
+          type: 'added',
           children: null,
-        }];
-      })
-      .flat();
-  };
+        };
+      }
 
-  return {
-    key: null,
-    value: null,
-    type: 'nested',
-    children: iter(data1, data2),
-  };
+      if (!Object.hasOwn(data2, key)) {
+        return {
+          key,
+          value: file1Value,
+          type: 'removed',
+          children: null,
+        };
+      }
+
+      if (_.isObject(file1Value) && _.isObject(file2Value)) {
+        return {
+          key,
+          value: null,
+          type: 'nested',
+          children: genDiffTree(file1Value, file2Value),
+        };
+      }
+
+      if (file1Value === file2Value) {
+        return {
+          key,
+          value: file1Value,
+          type: 'unchanged',
+          children: null,
+        };
+      }
+
+      return {
+        key,
+        value: file2Value,
+        oldValue: file1Value,
+        type: 'changed',
+        children: null,
+      };
+    });
 };
 
 export default genDiffTree;
