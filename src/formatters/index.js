@@ -11,7 +11,6 @@ export default (diffTree, format) => {
       return plain(diffTree);
 
     case 'json':
-      console.log('json');
       return json(diffTree);
 
     default:
